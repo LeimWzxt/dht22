@@ -1,0 +1,65 @@
+Arduino C
+
+#include <SoftwareSerial.h>
+SoftwareSerial tx(14, 12);
+
+#include <DHT.h>
+#define DHTTYPE DHT22
+#define t1 5000
+
+DHT dht1(5, DHTTYPE);
+DHT dht2(4, DHTTYPE);
+DHT dht3(0, DHTTYPE);
+DHT dht4(2, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  
+  tx.begin(9600);
+  dht1.begin(); dht2.begin();
+  dht3.begin(); dht4.begin();
+}
+
+void loop() {
+  String datos = "";
+
+  int hume1 = dht1.readHumidity();
+  int temp1 = dht1.readTemperature();
+  int hume2 = dht2.readHumidity();
+  int temp2 = dht2.readTemperature();
+  int hume3 = dht3.readHumidity();
+  int temp3 = dht3.readTemperature();
+  int hume4 = dht4.readHumidity();
+  int temp4 = dht4.readTemperature();
+  
+  createJson("NODO1",temp1, hume1, temp2, hume2, temp3, hume3, temp4, hume4);
+
+  delay(t1);
+
+}
+
+void creacionArray(int temp, int hum, bool isLast = false) {
+  Serial.print ("[");
+  Serial.print (temp);
+  Serial.print (",");
+  Serial.print (hum);
+  Serial.print ("]");
+  if(!isLast){
+    Serial.print (",");
+  }
+}
+void createJson(char *tag, int temp1, int hume1, int temp2, int hume2, int temp3, int hume3, int temp4, int hume4){
+  Serial.print("{\"node\":\"");
+  Serial.print(tag);
+  Serial.print("\",");
+  Serial.print ("\"data\":[");
+    creacionArray(temp1, hume1,false);
+    creacionArray(temp2, hume2,false);
+    creacionArray(temp3, hume3,false);
+    creacionArray(temp4, hume4,true);
+  Serial.println("]}");
+
+}
+
+
+
